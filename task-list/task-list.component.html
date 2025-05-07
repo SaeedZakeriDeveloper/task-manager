@@ -1,0 +1,9 @@
+<p *ngFor="let tasks of allTask">{{tasks.title}} 
+    <button (click)="onEditButtonClicked(tasks.id)">Edit</button>
+    <button (click)="onDeleteButtonClicked(tasks.id)">delete</button>
+</p>
+
+
+<button (click)="onAddNewTaskClicked()">Add new task</button>
+
+<app-task [visible]="taskVisible" [id]="taskId" ></app-task>
