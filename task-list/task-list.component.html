@@ -1,9 +1,24 @@
-<p *ngFor="let tasks of allTask">{{tasks.title}} 
-    <button (click)="onEditButtonClicked(tasks.id)">Edit</button>
-    <button (click)="onDeleteButtonClicked(tasks.id)">delete</button>
-</p>
-
-
-<button (click)="onAddNewTaskClicked()">Add new task</button>
-
-<app-task [visible]="taskVisible" [id]="taskId" ></app-task>
+<div class="task-list-container" [class.modal-open]="taskVisible">
+    <h2 class="task-list-title">📋 Your Tasks</h2>
+  
+    <div *ngFor="let tasks of allTask" class="task-card">
+      <span class="task-title">{{ tasks.title }}</span>
+      <div class="task-actions">
+        <button class="edit" (click)="onEditButtonClicked(tasks.id)">Edit</button>
+        <button class="delete" (click)="onDeleteButtonClicked(tasks.id)">Delete</button>
+      </div>
+    </div>
+  
+    <button class="add-btn" (click)="onAddNewTaskClicked()">➕ Add New Task</button>
+  
+    <div class="modal-overlay" *ngIf="taskVisible"></div>
+  
+    <app-task
+      *ngIf="taskVisible"
+      class="task-modal"
+      [visible]="taskVisible"
+      [id]="taskId"
+      (formSubmitted)="onFormSubmitted()">
+    </app-task>
+  </div>
+  

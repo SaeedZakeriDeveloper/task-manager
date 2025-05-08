@@ -1,6 +1,5 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
 import { ITask } from 'src/app/Interfaces/ITasks';
 import { TasksService } from 'src/app/services/tasks.service';
 
@@ -9,43 +8,9 @@ import { TasksService } from 'src/app/services/tasks.service';
   templateUrl: './task.component.html',
   styleUrls: ['./task.component.css']
 })
-export class TaskCreateComponent {
+export class TaskCreateComponent implements OnChanges {
 
-  modalTitle: string = "" 
-  @Input() id: number=0;
-
-  private _visible: boolean = false;
-
-  @Input()
-  set visible(val: boolean) {
-    this._visible = val;
-    this.onVisibleChange(val);
-  }
-
-  get visible(): boolean {
-    return this._visible;
-  }
-
-  onVisibleChange(newValue: boolean) {
-    if (newValue) {
-      if (this.id) {
-        this.modalTitle = "Edit Task"
-        this.taskService.getTaskById(this.id).subscribe((res) => {
-          this.taskForm.get("title")?.setValue(res.title);
-          this.taskForm.get("description")?.setValue(res.description ?? null)
-          this.taskForm.get("deadline")?.setValue(res.deadline ?? null)
-          this.taskForm.get("priority")?.setValue(res.priority)
-          this.taskForm.get("completed")?.setValue(res.completed)
-        })
-      } else {
-        this.modalTitle = "Add New Task"
-        this.taskForm.reset()
-      }
-
-    } else {
-
-    }
-  }
+  constructor(private taskService: TasksService) {}
 
   task: ITask = {
     id: 0,
@@ -54,11 +19,13 @@ export class TaskCreateComponent {
     deadline: "2025-05-08",
     priority: "Medium",
     completed: false
-  }
+  };
 
-  constructor(private taskService: TasksService, private router: Router) {
-    console.log('tesst')
-  }
+  modalTitle: string = "";
+
+  @Input() id: number = 0;
+  @Input() visible: boolean = false;
+  @Output() formSubmitted: EventEmitter<void> = new EventEmitter<void>();
 
 
   taskForm = new FormGroup({
@@ -69,26 +36,49 @@ export class TaskCreateComponent {
     completed: new FormControl<boolean>(false, [Validators.required])
   });
 
-
-  onSubmit() {
-    this.taskService.getAllTask().subscribe((res) => {
-      let id = Math.max(...res.map(x => x.id))
-      this.task.id = id + 1
-      this.task.title = this.taskForm.value.title!
-      this.task.priority = this.taskForm.value.priority! as 'High' | 'Medium' | 'Low';
-      this.task.description = this.taskForm.value.description!
-      this.task.deadline = this.taskForm.value.deadline!
-      this.task.completed = String(this.taskForm.value.completed) === 'true';
-
-      this.taskService.add(this.task).subscribe((res) => {
-        this.router.navigate([''])
-      })
-    })
-
-
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['visible'] || changes['id']) {
+      if (this.visible) {
+        if (this.id && this.id !== 0) {
+          this.modalTitle = "Edit Task";
+          this.taskService.getTaskById(this.id).subscribe((res) => {
+            this.taskForm.get("title")?.setValue(res.title);
+            this.taskForm.get("description")?.setValue(res.description ?? null);
+            this.taskForm.get("deadline")?.setValue(res.deadline ?? null);
+            this.taskForm.get("priority")?.setValue(res.priority);
+            this.taskForm.get("completed")?.setValue(res.completed);
+          });
+        } else {
+          this.modalTitle = "Add New Task";
+          this.taskForm.reset();
+        }
+      }
+    }
   }
 
-  onShowAllTaskButtonClicked() {
-    this.router.navigate(['/'])
+  onSubmit() {
+    this.task.title = this.taskForm.value.title!;
+    this.task.priority = this.taskForm.value.priority! as 'High' | 'Medium' | 'Low';
+    this.task.description = this.taskForm.value.description!;
+    this.task.deadline = this.taskForm.value.deadline!;
+    this.task.completed = String(this.taskForm.value.completed) === 'true';
+
+    if (this.id && this.id !== 0) {
+      
+      this.task.id = this.id;
+      this.taskService.update(this.id, this.task).subscribe((res) => {
+        this.formSubmitted.emit()
+      });
+    } else {
+      
+      this.taskService.getAllTask().subscribe((res) => {
+        let newId = res.length > 0 ? Math.max(...res.map(x => x.id)) + 1 : 1;
+        this.task.id = newId;
+
+        this.taskService.add(this.task).subscribe((res) => {
+          this.formSubmitted.emit()
+        });
+      });
+    }
   }
 }
