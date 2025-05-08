@@ -26,6 +26,7 @@ export class TaskCreateComponent implements OnChanges {
   @Input() id: number = 0;
   @Input() visible: boolean = false;
   @Output() formSubmitted: EventEmitter<void> = new EventEmitter<void>();
+  @Output() closeForm: EventEmitter<void> = new EventEmitter<void>();
 
 
   taskForm = new FormGroup({

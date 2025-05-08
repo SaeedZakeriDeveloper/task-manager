@@ -45,4 +45,7 @@ export class TaskListComponent implements OnInit {
     this.taskVisible = false;
     this.loadTasks();
   }
+  onCloseForm() { 
+    this.taskVisible = false;
+  }
 }

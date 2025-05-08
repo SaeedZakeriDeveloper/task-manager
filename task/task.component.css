@@ -82,4 +82,38 @@ html, body {
     background-color: #574b90;
     cursor: pointer;
   }
+  .form-wrapper {
+    position: relative; 
+  }
+  
+  .close-btn {
+    position: absolute; 
+    top: 10px; 
+    right: 10px;
+    background-color: transparent; 
+    border: none;
+    font-size: 24px;
+    color: #999; 
+    cursor: pointer; 
+  }
+  
+  .close-btn:hover {
+    color: #333; 
+  }
+  
+  .close-btn:focus {
+    outline: none; 
+  }
+  
+  form {
+    margin-top: 40px;
+  }
+  
+  .form-group {
+    margin-bottom: 20px; 
+  }
+  
+  button {
+    margin-top: 20px;
+  }
   

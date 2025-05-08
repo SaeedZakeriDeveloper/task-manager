@@ -18,7 +18,8 @@
       class="task-modal"
       [visible]="taskVisible"
       [id]="taskId"
-      (formSubmitted)="onFormSubmitted()">
+      (formSubmitted)="onFormSubmitted()"
+      (closeForm)="onCloseForm()">
     </app-task>
   </div>
   
